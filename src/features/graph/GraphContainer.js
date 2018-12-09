@@ -26,7 +26,10 @@ export default class GraphContainer extends React.Component {
     componentDidMount() {
         cytoscape({
             container: document.getElementById('graph'),
-            elements: this.simulate()
+            elements: this.simulate(),
+            layout: {
+                name: 'cose'
+            }
         });
     }
 
