@@ -9,7 +9,7 @@ export default class GraphContainer extends React.Component {
 
         this.nodesSleep = [];
         this.nodesDead = [];
-        this.T = 100;
+        this.T = 20;
 
         this.nodesAll = [];
         this.edgesAll = [];
@@ -30,58 +30,84 @@ export default class GraphContainer extends React.Component {
         });
     }
 
-    N = (t) => Math.floor(3900*t*t + 76000*t - 13000);
+    // N = (t) => Math.abs(Math.floor(3900*t*t + 76000*t - 130000));
+    N = (t) => Math.abs(Math.floor(Math.exp(0.25 * t)));
+
     lifetime = () => {
-        const lambda = 0.0018;
+        const lambda = 0.0092;
         return Math.floor(-Math.log(1.0 - Math.random()) / lambda);
     }
 
     sleeptime = () => Math.floor(this.lifetime() / 10); // Jak oni to robią kompletnie tego nie rozumiem
 
     // Powinny być wybierany te z wieloma linkami z większym prawdopodobienstwem
-    lookForManyLinksNode = (nodes) => nodes[Math.floor(Math.random() * nodes.length)];
+    lookForManyLinksNode = (nodes) => {
+        let probabilityNodes =
+            nodes.flatMap(n => Array.apply(null, Array(n.links.length)).map(() => n));
+
+        if(probabilityNodes.length === 0) probabilityNodes = nodes;
+
+        return probabilityNodes[Math.floor(Math.random() * probabilityNodes.length)];
+    }
     
     getRandomLink = (node) => {
-        if(!!node.links) return;
-        let node1 = node.links[Math.floor(Math.random() * node.links.length)];
-        if(!!node1.links) return;
+        let node1 =
+            node.links[Math.floor(Math.random() * node.links.length)];
         return node1.links[Math.floor(Math.random() * node1.links.length)];
     }
 
     simulate = () => {
         for(let t = 1; t < this.T; t++) {
             // punkt 1
-            let nodes = [];
-            // Stała ilość w kazdej iteracji
             // Oni mają do tego funkcje ale ona zwraca strasznie duze liczby
-            for(let i = 0; i < 10; i++) {
-                nodes.push({id: uniqid()});
-            }
+            let nodes = Array.apply(null, Array(this.N(t))).map(() => ({id: uniqid()}))
             
             // punkt 2
-            nodes.forEach(n => {n.death_time = this.lifetime() + t});
+            nodes.forEach(n => { n.death_time = this.lifetime() + t; });
             
-            //punkt 3  - zakładam, że wybieramy tylko ze śpiących i nowych
-            nodes.forEach(n => {n.links = [this.lookForManyLinksNode(this.nodesSleep.concat(nodes))]});
+            //punkt 3  - zakładam, że wybieramy tylko ze śpiących
+            nodes.forEach(n => {
+                if(this.nodesSleep.length === 0) { //w pierwszej iteracji nie wybieram polaczen
+                    n.links = [];
+                }
+                else {
+                    // console.log(t);
+                    // console.log(this.nodesSleep);
+                    let linkNode = this.lookForManyLinksNode(this.nodesSleep);
+                    // console.log(linkNode);
+                    n.links = [linkNode]
+                    linkNode.links.push(n); //linki w dwie strony
+                }
+            });
             
             //punkt 4
-            nodes.forEach(n => {n.wake_time = this.sleeptime() + t});
-
-            this.nodesSleep = this.nodesSleep.concat(nodes);
+            nodes.forEach(n => { n.wake_time = this.sleeptime() + t; });
             
             //punkt 5 - trzeba sprawdzić, żebyśmy nie powtarzali node'ów
             let nodesAwaken = this.nodesSleep.filter(n => n.wake_time <= t);
-            nodesAwaken.forEach(n => {n.links.push(this.getRandomLink(n))});
+
+            nodesAwaken.forEach(n => {
+                let linkNode = this.getRandomLink(n);
+                if(linkNode !== n) {
+                    n.links.push(linkNode);
+                    linkNode.links.push(n);
+                }
+            });
             
             //punkt 6
             let newNodesDead = nodesAwaken.filter(n => n.death_time <= t);
-            //Usuwamy nowe martwe node'y
+            //Usuwamy nowe martwe node'y ze ze śpiących
             this.nodesSleep = this.nodesSleep.filter(n => !newNodesDead.includes(n));
-
             this.nodesDead = this.nodesDead.concat(newNodesDead);
+
+            this.nodesSleep = this.nodesSleep.concat(nodes);
+
+            console.log('Iteration: ' + t);
+            console.log(this.nodesDead.length)
+            console.log(this.nodesSleep.length)
         }
 
-        //Dalej to jest przerabioanie danych dla cytoscape
+        //Przetwarzanie danych dla cytoscape
         this.nodesSleep.forEach(n => {
             this.nodesAll.push({data:{id: n.id}});
 
@@ -108,8 +134,6 @@ export default class GraphContainer extends React.Component {
             });
         });
 
-        console.log(this.nodesDead);
-        console.log({nodes: this.nodesAll, edges: this.edgesAll});
         return {nodes: this.nodesAll, edges: this.edgesAll};
     }
 }
