@@ -7,6 +7,7 @@
   flex-direction: row;
   align-items: center;
   background-color: plum;
+  box-sizing: border-box;
 }
 
 .navbar-text {
