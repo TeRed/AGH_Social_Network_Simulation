@@ -5,6 +5,9 @@ import uniqid from "uniqid";
 import { CyUtil } from "../utils/CyUtil";
 
 export default class GraphContainer extends React.Component {
+  // cytoscape reference
+  CY = null;
+
   nodesSleep = [];
   nodesDead = [];
   T = 20;
@@ -21,7 +24,7 @@ export default class GraphContainer extends React.Component {
   }
 
   componentDidMount() {
-    cytoscape({
+    this.CY = cytoscape({
       container: document.getElementById("graph"),
       elements: this.simulate(),
       layout: {
