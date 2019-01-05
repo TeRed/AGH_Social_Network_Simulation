@@ -51,4 +51,24 @@ export class CyUtil {
 
     console.log(`CC(${t}) = ' + ${triangles / trials}`);
   }
+
+  static nodesEdgesNumberPlotData(nodesSleep) {
+    const dataPoints = [];
+    const map = new Map();
+
+    nodesSleep.forEach(n => {
+      const numberOfLinks = n.links.length;
+
+      if(map.has(numberOfLinks))
+        map.set(numberOfLinks, map.get(numberOfLinks) + 1);
+      else
+        map.set(numberOfLinks, 1);
+    });
+
+    Object.keys(map).forEach(key => {
+      dataPoints.push({ label: key, y: map[key] });
+    });
+
+    return dataPoints;
+  }
 }
