@@ -15,6 +15,7 @@ export class CyUtil {
 
   static getRandomLink(node) {
     let node1 = node.links[Math.floor(Math.random() * node.links.length)];
+    if(node1 === undefined) return node;
     return node1.links[Math.floor(Math.random() * node1.links.length)];
   }
 
