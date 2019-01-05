@@ -10,25 +10,7 @@ export default class GraphContainer extends React.Component {
 
   nodesSleep = [];
   nodesDead = [];
-  T = 20;
-  currentT = 1;
-
-  averageClustering(t) {
-    let triangles = 0
-    const nodes = this.nodesSleep;
-    const trials = nodes.length;
-
-    nodes.forEach(n => {
-      if(n.links.length >= 2) {
-        const shuffled = n.links.sort(() => .5 - Math.random());
-        const [u, v] = shuffled.slice(0,2);
-
-        if(u.links.includes(v)) triangles++;
-      }
-    });
-
-    console.log(`CC(${t}) = ' + ${triangles / trials}`);
-  }
+  T = 100;
 
   render() {
     return <div className={"GraphContainer"} id="cy" />;
@@ -44,26 +26,26 @@ export default class GraphContainer extends React.Component {
 
     setTimeout(() => {
       for (let t = 1; t < this.T; t++) {
-        setTimeout(() => this.simulate(t), t * 1000);
+        setTimeout(() => this.simulate(t), t * 1500);
       }
     }, 0);
   }
 
   simulate = t => {
-    // punkt 1
-    // Oni mają do tego funkcje ale ona zwraca strasznie duze liczby
+    // Tworzymy nowe node'y
     let nodes = Array.apply(null, Array(CyUtil.N(t))).map(() => ({
       id: uniqid()
     }));
 
+    // Dodajemy je do grafu
     this.CY.add(nodes.map(el => ({ group: "nodes", data: { id: el.id } })));
 
-    // punkt 2
+    // Wyliczamy czas zycia nowych node'ów
     nodes.forEach(n => {
       n.deathTime = CyUtil.lifetime() + t;
     });
 
-    //punkt 3  - zakładam, że wybieramy tylko ze śpiących
+    // Dla kazdego z nowych node'ów wybieramy sąsiada
     nodes.forEach(n => {
       if (this.nodesSleep.length === 0) {
         //w pierwszej iteracji nie wybieram polaczen
@@ -82,18 +64,18 @@ export default class GraphContainer extends React.Component {
       }
     });
 
-    //punkt 4
+    // Usypiamy nowe node'y
     nodes.forEach(n => {
       n.wakeTime = CyUtil.sleeptime() + t;
     });
 
 
-    //punkt 5 - trzeba sprawdzić, żebyśmy nie powtarzali node'ów
+    // Ze spiacych wybieramy wybudzone node'y
     let nodesAwaken = this.nodesSleep.filter(n => n.wakeTime <= t);
-
     nodesAwaken.forEach(n => {
       let linkNode = CyUtil.getRandomLink(n);
-      if (linkNode !== n) {
+      
+      if (linkNode !== n && linkNode !== undefined) {
         n.links.push(linkNode);
         linkNode.links.push(n);
         this.CY.add({
@@ -101,24 +83,33 @@ export default class GraphContainer extends React.Component {
           data: { source: n.id, target: linkNode.id }
         });
       }
+
+      n.wakeTime = CyUtil.sleeptime() + t;
     });
 
-    //punkt 6
+    // Wybieramy martwe node'y
     let newNodesDead = nodesAwaken.filter(n => n.deathTime <= t);
+    // Usuwamy martwe node'y ze spiących
+    this.nodesSleep = this.nodesSleep.filter(n => !newNodesDead.includes(n));
+    // Dodajemy nowe node'y do spiących
+    this.nodesSleep = this.nodesSleep.concat(nodes);
+
+    // Wyrzucamy martwe node'y z grafu
     newNodesDead.forEach(n => {
       n.links.forEach(el => {
         el.links = el.links.filter(item => item !== n);
+        if(el.links.length === 0) {
+          this.CY.remove(this.CY.$('#' + el.id));
+        }
       });
+
       this.CY.remove(this.CY.$('#' + n.id));
     });
-
-    //Usuwamy nowe martwe node'y ze ze śpiących
-    this.nodesSleep = this.nodesSleep.filter(n => !newNodesDead.includes(n));
+    
     this.nodesDead = this.nodesDead.concat(newNodesDead);
 
-    this.nodesSleep = this.nodesSleep.concat(nodes);
     this.CY.layout({ name: "cose", animate: 'end', componentSpacing: 15 }).run();
 
-    this.averageClustering(t);
+    CyUtil.averageClustering(t, this.nodesSleep);
   };
 }
