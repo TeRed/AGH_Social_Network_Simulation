@@ -3,6 +3,7 @@ import "./GraphContainer.css";
 import cytoscape from "cytoscape";
 import uniqid from "uniqid";
 import { CyUtil } from "../utils/CyUtil";
+import Button from "../../components/Button/Button";
 
 export default class GraphContainer extends React.Component {
   // cytoscape reference
@@ -12,11 +13,12 @@ export default class GraphContainer extends React.Component {
   nodesDead = [];
   T = 100;
 
-  render() {
-    return <div className={"GraphContainer"} id="cy" />;
-  }
+  state = {
+    simulationStarted: false
+  };
 
-  componentDidMount() {
+  startSimulation = () => {
+    this.setState({ simulationStarted: true });
     this.CY = cytoscape({
       container: document.getElementById("cy"),
       layout: {
@@ -29,7 +31,7 @@ export default class GraphContainer extends React.Component {
         setTimeout(() => this.simulate(t), t * 1500);
       }
     }, 0);
-  }
+  };
 
   simulate = t => {
     // Tworzymy nowe node'y
@@ -69,12 +71,11 @@ export default class GraphContainer extends React.Component {
       n.wakeTime = CyUtil.sleeptime() + t;
     });
 
-
     // Ze spiacych wybieramy wybudzone node'y
     let nodesAwaken = this.nodesSleep.filter(n => n.wakeTime <= t);
     nodesAwaken.forEach(n => {
       let linkNode = CyUtil.getRandomLink(n);
-      
+
       if (linkNode !== n && linkNode !== undefined) {
         n.links.push(linkNode);
         linkNode.links.push(n);
@@ -98,18 +99,32 @@ export default class GraphContainer extends React.Component {
     newNodesDead.forEach(n => {
       n.links.forEach(el => {
         el.links = el.links.filter(item => item !== n);
-        if(el.links.length === 0) {
-          this.CY.remove(this.CY.$('#' + el.id));
+        if (el.links.length === 0) {
+          this.CY.remove(this.CY.$("#" + el.id));
         }
       });
 
-      this.CY.remove(this.CY.$('#' + n.id));
+      this.CY.remove(this.CY.$("#" + n.id));
     });
-    
+
     this.nodesDead = this.nodesDead.concat(newNodesDead);
 
-    this.CY.layout({ name: "cose", animate: 'end', componentSpacing: 15 }).run();
+    this.CY.layout({
+      name: "cose",
+      animate: "end",
+      componentSpacing: 15,
+    }).run();
 
     CyUtil.averageClustering(t, this.nodesSleep);
   };
+
+  render() {
+    const {simulationStarted} = this.state;
+    return (
+      <>
+        <div className={"GraphContainer"} id="cy" />
+        {simulationStarted ? null : <Button onClick={this.startSimulation} text={"START"} />}
+      </>
+    );
+  }
 }
