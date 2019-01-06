@@ -2,8 +2,8 @@ import React from "react";
 import "./GraphContainer.css";
 import cytoscape from "cytoscape";
 import uniqid from "uniqid";
-import { CyUtil } from "../utils/CyUtil";
-import Button from "../../components/Button/Button";
+import { CyUtil } from "../../utils/CyUtil";
+import Button from "../Button/Button";
 
 export default class GraphContainer extends React.Component {
   // cytoscape reference

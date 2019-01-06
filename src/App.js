@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "./App.css";
-import { NavBar } from "./features/navbar/NavBar";
-import GraphContainer from "./features/graph/GraphContainer";
+import { NavBar } from "./components/NavBar/NavBar";
+import GraphContainer from "./components/GraphContainer/GraphContainer";
 
 class App extends Component {
   render() {
