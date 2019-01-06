@@ -53,8 +53,8 @@ export class CyUtil {
     return triangles / trials;
   }
 
-  static calculateGraphDensity(it, nodes, edges) {
-    
+  static calclateAverageNodeDegree(nodes) {
+    return nodes.totalDegree(true) / nodes.length;
   }
 
   static nodesEdgesNumberPlotData(nodesSleep) {

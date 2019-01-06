@@ -19,6 +19,10 @@ export default class GraphContainer extends React.Component {
     diagnosticData: {
       clusteringCoefficient: 0,
       graphDensity: 0,
+      averageDegree:0 ,
+      totalDegree: 0,
+      minDegree: 0,
+      maxDegree: 0,
     }
   };
 
@@ -135,11 +139,15 @@ export default class GraphContainer extends React.Component {
       componentSpacing: 15
     }).run();
 
-    console.log(this.CY.edges().length);
+    console.log(this.CY.nodes());
     this.setState({
       diagnosticData: {
         clusteringCoefficient: CyUtil.calculateAverageClustering(t, this.nodesSleep),
         graphDensity: this.CY.edges().length / this.CY.nodes().length,
+        averageDegree: this.CY.nodes().totalDegree(true) / this.CY.nodes().length,
+        totalDegree: this.CY.nodes().totalDegree(true),
+        minDegree: this.CY.nodes().minDegree(true),
+        maxDegree: this.CY.nodes().maxDegree(true),
       }
     });
   };
