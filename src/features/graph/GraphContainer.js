@@ -23,7 +23,22 @@ export default class GraphContainer extends React.Component {
       container: document.getElementById("cy"),
       layout: {
         name: "cose"
-      }
+      },
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'background-color': '#FC4A1A',
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 3,
+            'line-color': '#F7B733',
+          }
+        }
+      ]
     });
 
     setTimeout(() => {
