@@ -4,6 +4,7 @@ import cytoscape from "cytoscape";
 import uniqid from "uniqid";
 import { CyUtil } from "../../utils/CyUtil";
 import Button from "../Button/Button";
+import LiveData from "../LiveData/LiveData";
 
 export default class GraphContainer extends React.Component {
   // cytoscape reference
@@ -14,7 +15,10 @@ export default class GraphContainer extends React.Component {
   T = 100;
 
   state = {
-    simulationStarted: false
+    simulationStarted: false,
+    diagnosticData: {
+      clusteringCoefficient: 0
+    }
   };
 
   startSimulation = () => {
@@ -26,16 +30,16 @@ export default class GraphContainer extends React.Component {
       },
       style: [
         {
-          selector: 'node',
+          selector: "node",
           style: {
-            'background-color': '#FC4A1A',
+            "background-color": "#FC4A1A"
           }
         },
         {
-          selector: 'edge',
+          selector: "edge",
           style: {
-            'width': 3,
-            'line-color': '#F7B733',
+            width: 3,
+            "line-color": "#F7B733"
           }
         }
       ]
@@ -126,19 +130,28 @@ export default class GraphContainer extends React.Component {
 
     this.CY.layout({
       name: "cose",
-      animate: "end",
-      componentSpacing: 15,
+      animate: false,
+      componentSpacing: 15
     }).run();
 
-    CyUtil.averageClustering(t, this.nodesSleep);
+    this.setState({
+      diagnosticData: {
+        clusteringCoefficient: CyUtil.calculateAverageClustering(t, this.nodesSleep)
+      }
+    });
   };
 
   render() {
-    const {simulationStarted} = this.state;
+    const { simulationStarted } = this.state;
     return (
       <>
         <div className={"GraphContainer"} id="cy" />
-        {simulationStarted ? null : <Button onClick={this.startSimulation} text={"START"} />}
+        {simulationStarted ? (
+          <LiveData diagnosticData={this.state.diagnosticData} />
+        ) : null}
+        {simulationStarted ? null : (
+          <Button onClick={this.startSimulation} text={"START"} />
+        )}
       </>
     );
   }
