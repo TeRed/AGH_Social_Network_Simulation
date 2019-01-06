@@ -1,6 +1,6 @@
 import React from "react";
+import { Text } from "../Text/Text";
 import "./NavBar.css";
-import { Text } from "../../components/Text/Text";
 
 export const NavBar = () => (
   <div className="NavBar">

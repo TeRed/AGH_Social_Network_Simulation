@@ -35,7 +35,7 @@ export class CyUtil {
     ];
   }
 
-  static averageClustering(t, nodesSleep) {
+  static calculateAverageClustering(t, nodesSleep) {
     let triangles = 0
     const nodes = nodesSleep;
     const trials = nodes.length;
@@ -50,6 +50,11 @@ export class CyUtil {
     });
 
     console.log(`CC(${t}) = ' + ${triangles / trials}`);
+    return triangles / trials;
+  }
+
+  static calculateGraphDensity(it, nodes, edges) {
+    
   }
 
   static nodesEdgesNumberPlotData(nodesSleep) {
