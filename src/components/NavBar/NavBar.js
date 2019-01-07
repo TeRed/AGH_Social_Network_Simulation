@@ -4,7 +4,7 @@ import "./NavBar.css";
 
 export const NavBar = () => (
   <div className="NavBar">
-    <Text className={"navbar-text"} size={2}>
+    <Text color={"#dfdce3"} size={1.5}>
       Social Network Evolution
     </Text>
   </div>

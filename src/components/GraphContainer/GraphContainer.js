@@ -22,8 +22,6 @@ export default class GraphContainer extends React.Component {
         graphDensity: 0,
         averageDegree:0 ,
         totalDegree: 0,
-        minDegree: 0,
-        maxDegree: 0
       },
       plotData: null
     }
@@ -42,14 +40,14 @@ export default class GraphContainer extends React.Component {
         {
           selector: "node",
           style: {
-            "background-color": "#FC4A1A"
+            "background-color": "#F7B733"
           }
         },
         {
           selector: "edge",
           style: {
             width: 3,
-            "line-color": "#F7B733"
+            "line-color": "#FC4A1A"
           }
         }
       ]
@@ -154,8 +152,6 @@ export default class GraphContainer extends React.Component {
           graphDensity: this.CY.edges().length / this.CY.nodes().length,
           averageDegree: this.CY.nodes().totalDegree(true) / this.CY.nodes().length,
           totalDegree: this.CY.nodes().totalDegree(true),
-          minDegree: this.CY.nodes().minDegree(true),
-          maxDegree: this.CY.nodes().maxDegree(true)
         },
         plotData: CyUtil.nodesEdgesNumberPlotData(this.nodesSleep)
       }
