@@ -58,7 +58,6 @@ export class CyUtil {
   }
 
   static nodesEdgesNumberPlotData(nodesSleep) {
-    const dataPoints = [];
     const map = new Map();
 
     nodesSleep.forEach(n => {
@@ -70,10 +69,10 @@ export class CyUtil {
         map.set(numberOfLinks, 1);
     });
 
-    Object.keys(map).forEach(key => {
-      dataPoints.push({ label: key, y: map[key] });
-    });
-
-    return dataPoints;
+    return {
+      x: Array.from(map.keys()),
+      y: Array.from(map.values()),
+      type: 'bar'
+    };
   }
 }

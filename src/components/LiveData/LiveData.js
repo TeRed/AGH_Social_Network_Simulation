@@ -1,17 +1,19 @@
 import React from 'react'
 import './LiveData.css';
 
-const LiveData = ({diagnosticData}) => {
-  return (
-    <div className={'LiveData'}>
-        <ul>
-            {Object.keys(diagnosticData).map(key => (
-                <li>{key} = {diagnosticData[key]}</li>
-            ))}
-        </ul>
-    </div>
-  )
+export default class LiveData extends React.Component {
+    render() {
+        return (
+            <div className={'LiveData'}>
+                <ul>
+                    {Object.keys(this.props.diagnosticData).map(key => (
+                        <li>{key} = {this.props.diagnosticData[key]}</li>
+                    ))}
+                </ul>
+        
+                <div id='plot'></div>
+            </div>
+        );
+    }
+  
 }
-
-export default LiveData
-
