@@ -18,6 +18,7 @@ export default class GraphContainer extends React.Component {
     simulationRunning: false,
     diagnosticData: {
       atom: {
+        iteration: 0,
         clusteringCoefficient: 0,
         graphDensity: 0,
         averageDegree: 0,
@@ -55,9 +56,11 @@ export default class GraphContainer extends React.Component {
     });
 
     for (let t = 1; t < this.T; t++) {
-      this.timeouts.push(setTimeout(() => {
-        if (this.state.simulationRunning) this.simulate(t);
-      }, t * 2000));
+      this.timeouts.push(
+        setTimeout(() => {
+          if (this.state.simulationRunning) this.simulate(t);
+        }, t * 1000)
+      );
     }
   };
 
@@ -145,17 +148,22 @@ export default class GraphContainer extends React.Component {
 
     // Dodajemy nowe node'y do spiących
     this.nodesSleep = this.nodesSleep.concat(nodes);
-
+    
     this.CY.layout({
       name: "cose",
       animate: false,
-      componentSpacing: 15
+      padding: 60,
+      componentSpacing: 15,
+      nestingFactor: 1.2,
+      gravity: 12,
+      weaver: true
     }).run();
 
     // console.log(this.CY.nodes());
     this.setState({
       diagnosticData: {
         atom: {
+          iteration: t,
           clusteringCoefficient: CyUtil.calculateAverageClustering(
             t,
             this.nodesSleep
@@ -169,7 +177,7 @@ export default class GraphContainer extends React.Component {
       }
     });
 
-    Plotly.newPlot("plot", [this.state.diagnosticData.plotData]);
+    Plotly.newPlot("plot", [this.state.diagnosticData.plotData], {width: 300, height: 350, margin: 10, paper: '#FFFFFF80'});
   };
 
   render() {
