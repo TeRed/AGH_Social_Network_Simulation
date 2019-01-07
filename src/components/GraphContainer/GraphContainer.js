@@ -85,6 +85,11 @@ export default class GraphContainer extends React.Component {
     newNodesDead.forEach(n => {
       n.links.forEach(el => {
         el.links = el.links.filter(item => item !== n);
+
+        if(el.links.length === 0) {
+          el.deathTime = t;
+          el.wakeTime = t + 1;
+        }
       });
       this.CY.remove(this.CY.$("#" + n.id));
     });
@@ -97,7 +102,7 @@ export default class GraphContainer extends React.Component {
 
     nodesAwaken.forEach(n => {
       let linkNode = CyUtil.getRandomLink(n);
-      // if(Math.floor(Math.random() * 20) === 1) linkNode = CyUtil.lookForManyLinksNode(this.nodesSleep);
+      if(Math.floor(Math.random() * 90) === 1) linkNode = CyUtil.lookForManyLinksNode(this.nodesSleep);
 
       if (linkNode !== n && linkNode !== undefined) {
         n.links.push(linkNode);
