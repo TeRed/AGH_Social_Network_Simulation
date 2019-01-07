@@ -12,6 +12,7 @@ export default class GraphContainer extends React.Component {
   CY = null;
   nodesSleep = [];
   T = 50;
+  timeouts = [];
 
   state = {
     simulationRunning: false,
@@ -27,8 +28,7 @@ export default class GraphContainer extends React.Component {
   };
 
   startSimulation = () => {
-    if (this.CY !== null)
-      this.CY.destroy();
+    if (this.CY !== null) this.CY.destroy();
     this.setState({ simulationRunning: true });
     this.CY = cytoscape({
       container: document.getElementById("cy"),
@@ -54,21 +54,18 @@ export default class GraphContainer extends React.Component {
       ]
     });
 
-    setTimeout(() => {
-      for (let t = 1; t < this.T; t++) {
-        setTimeout(() => {
-          if (this.state.simulationRunning)
-            this.simulate(t);
-        }, t * 2000);
-      }
-    }, 0);
+    for (let t = 1; t < this.T; t++) {
+      this.timeouts.push(setTimeout(() => {
+        if (this.state.simulationRunning) this.simulate(t);
+      }, t * 2000));
+    }
   };
 
   stopSimulation = () => {
-    this.setState({simulationRunning: false});
+    this.setState({ simulationRunning: false });
     this.nodesSleep = [];
-    for (let i = 0; i <= this.T; i++) {
-      window.clearTimeout(i);
+    for (const el of this.timeouts) {
+      clearTimeout(el);
     }
   };
 
