@@ -5,30 +5,31 @@ import uniqid from "uniqid";
 import { CyUtil } from "../../utils/CyUtil";
 import Button from "../Button/Button";
 import LiveData from "../LiveData/LiveData";
-import Plotly from 'plotly.js-dist';
+import Plotly from "plotly.js-dist";
 
 export default class GraphContainer extends React.Component {
   // cytoscape reference
   CY = null;
-
   nodesSleep = [];
   T = 50;
 
   state = {
-    simulationStarted: false,
+    simulationRunning: false,
     diagnosticData: {
       atom: {
         clusteringCoefficient: 0,
         graphDensity: 0,
-        averageDegree:0 ,
-        totalDegree: 0,
+        averageDegree: 0,
+        totalDegree: 0
       },
       plotData: null
     }
   };
 
   startSimulation = () => {
-    this.setState({ simulationStarted: true });
+    if (this.CY !== null)
+      this.CY.destroy();
+    this.setState({ simulationRunning: true });
     this.CY = cytoscape({
       container: document.getElementById("cy"),
       layout: {
@@ -55,13 +56,23 @@ export default class GraphContainer extends React.Component {
 
     setTimeout(() => {
       for (let t = 1; t < this.T; t++) {
-        setTimeout(() => this.simulate(t), t * 2000);
+        setTimeout(() => {
+          if (this.state.simulationRunning)
+            this.simulate(t);
+        }, t * 2000);
       }
     }, 0);
   };
 
-  simulate = t => {
+  stopSimulation = () => {
+    this.setState({simulationRunning: false});
+    this.nodesSleep = [];
+    for (let i = 0; i <= this.T; i++) {
+      window.clearTimeout(i);
+    }
+  };
 
+  simulate = t => {
     // Faza I
 
     // Ze spiacych wybieramy wybudzone node'y
@@ -69,7 +80,7 @@ export default class GraphContainer extends React.Component {
 
     // Wybieramy martwe node'y
     let newNodesDead = nodesAwaken.filter(n => n.deathTime <= t);
-    
+
     // Wyrzucamy martwe node'y z grafu
     newNodesDead.forEach(n => {
       n.links.forEach(el => {
@@ -83,7 +94,7 @@ export default class GraphContainer extends React.Component {
 
     // Ze spiacych wybieramy node wybudzone node'y
     nodesAwaken = this.nodesSleep.filter(n => n.wakeTime <= t);
-    
+
     nodesAwaken.forEach(n => {
       let linkNode = CyUtil.getRandomLink(n);
       // if(Math.floor(Math.random() * 20) === 1) linkNode = CyUtil.lookForManyLinksNode(this.nodesSleep);
@@ -148,29 +159,48 @@ export default class GraphContainer extends React.Component {
     this.setState({
       diagnosticData: {
         atom: {
-          clusteringCoefficient: CyUtil.calculateAverageClustering(t, this.nodesSleep),
+          clusteringCoefficient: CyUtil.calculateAverageClustering(
+            t,
+            this.nodesSleep
+          ),
           graphDensity: this.CY.edges().length / this.CY.nodes().length,
-          averageDegree: this.CY.nodes().totalDegree(true) / this.CY.nodes().length,
-          totalDegree: this.CY.nodes().totalDegree(true),
+          averageDegree:
+            this.CY.nodes().totalDegree(true) / this.CY.nodes().length,
+          totalDegree: this.CY.nodes().totalDegree(true)
         },
         plotData: CyUtil.nodesEdgesNumberPlotData(this.nodesSleep)
       }
     });
 
-    Plotly.newPlot('plot', [this.state.diagnosticData.plotData]);
+    Plotly.newPlot("plot", [this.state.diagnosticData.plotData]);
   };
 
   render() {
-    const { simulationStarted } = this.state;
+    const { simulationRunning } = this.state;
     return (
       <>
         <div className={"GraphContainer"} id="cy" />
-        {simulationStarted ? (
+        {simulationRunning ? (
           <LiveData diagnosticData={this.state.diagnosticData.atom} />
         ) : null}
-        {simulationStarted ? null : (
-          <Button onClick={this.startSimulation} text={"START"} />
+        {simulationRunning ? null : (
+          <Button
+            top={"50%"}
+            left={"50%"}
+            backgroundColor={"#f94b29"}
+            onClick={this.startSimulation}
+            text={"START"}
+          />
         )}
+        {simulationRunning ? (
+          <Button
+            top={108}
+            left={60}
+            backgroundColor={"#50bcac"}
+            onClick={this.stopSimulation}
+            text={"STOP"}
+          />
+        ) : null}
       </>
     );
   }

@@ -2,26 +2,23 @@
   width: 70px;
   height: 70px;
   border-radius: 35px;
-  background-color: #FC4A1A;
   color: #DFDCE3;
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  left: 50%;
-  top: 50%;
   margin-left: -35px;
   margin-top: -35px;
-  box-shadow: 0 0 50px 3px #4e4e4e;
+  box-shadow: 0 0 10px 3px #00000024;
 }
 
 .button:active {
   color: #DFDCE3;
   background-color: #F7B733;
-  box-shadow: 0 0 100px 5px #F7B733;
+  box-shadow: 0 0 10px 5px #F7B73364;
 
 }
 
 .button:hover {
-  box-shadow: 0 0 100px 5px #FC4A1A;
+  box-shadow: 0 0 10px 5px #FC4A1A64;
 }
