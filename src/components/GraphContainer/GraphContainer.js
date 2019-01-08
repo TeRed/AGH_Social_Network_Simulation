@@ -198,10 +198,34 @@ export default class GraphContainer extends React.Component {
       };
     });
 
-    Plotly.newPlot('cc-plot', [this.state.diagnosticData.ccPlotData],
-      {width: 300, height: 350, margin: 10, paper: '#FFFFFF80'});
-    Plotly.newPlot('density-plot', [this.state.diagnosticData.densityPlotData],
-      {width: 300, height: 350, margin: 10, paper: '#FFFFFF80'});
+    Plotly.newPlot('cc-plot', [this.state.diagnosticData.ccPlotData], {
+      width: 300,
+      height: 350,
+      margin: 10,
+      paper: '#FFFFFF80',
+      xaxis: {
+        title: 'Node degree',
+      },
+      yaxis: {
+        title: 'Number of nodes'
+      },
+      title: 'Node degree distribution'
+    });
+
+    Plotly.newPlot('density-plot', [this.state.diagnosticData.densityPlotData], {
+      width: 300,
+      height: 350,
+      margin: 10,
+      paper: '#FFFFFF80',
+      xaxis: {
+        title: 'Iteration',
+      },
+      yaxis: {
+        title: 'Graph density'
+      },
+      title: 'Graph density in time'
+    });
+
   };
 
   render() {
