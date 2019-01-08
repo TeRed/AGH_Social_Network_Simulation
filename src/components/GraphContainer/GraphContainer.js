@@ -35,8 +35,8 @@ export default class GraphContainer extends React.Component {
       container: document.getElementById("cy"),
       layout: {
         name: "cose",
-        padding: 40,
-        gravity: 0.5
+        padding: 60,
+        gravity: 12,
       },
       style: [
         {
@@ -132,10 +132,7 @@ export default class GraphContainer extends React.Component {
         //w pierwszej iteracji nie wybieram polaczen
         n.links = [];
       } else {
-        // console.log(t);
-        // console.log(this.nodesSleep);
         let linkNode = CyUtil.lookForManyLinksNode(this.nodesSleep);
-        // console.log(linkNode);
         n.links = [linkNode];
         linkNode.links.push(n); //linki w dwie strony
         this.CY.add({
@@ -145,7 +142,8 @@ export default class GraphContainer extends React.Component {
       }
 
       // Wyliczamy czas zycia nowych node'ów
-      n.deathTime = CyUtil.lifetime() + t;
+      const deathTime = CyUtil.lifetime() + t;
+      n.deathTime = deathTime > 8 ? deathTime : 8;
 
       // Wyliczamy czas snu node'ów
       n.wakeTime = CyUtil.sleeptime() + t;
@@ -164,7 +162,6 @@ export default class GraphContainer extends React.Component {
       weaver: true
     }).run();
 
-    // console.log(this.CY.nodes());
     this.setState({
       diagnosticData: {
         atom: {

@@ -8,7 +8,7 @@ export class CyUtil {
   }
 
   static sleeptime() {
-    return Math.floor(this.lifetime() / 10); // Jak oni to robią kompletnie tego nie rozumiem
+    return Math.floor(this.lifetime() / 10);
   }
 
   static lifetime() {
@@ -49,7 +49,6 @@ export class CyUtil {
       }
     });
 
-    console.log(`CC(${t}) = ' + ${triangles / trials}`);
     return triangles / trials;
   }
 
