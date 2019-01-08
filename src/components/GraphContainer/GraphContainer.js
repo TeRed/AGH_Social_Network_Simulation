@@ -24,13 +24,27 @@ export default class GraphContainer extends React.Component {
         averageDegree: 0,
         totalDegree: 0
       },
-      plotData: null
+      ccPlotData: null,
+      densityPlotData: null
     }
   };
 
   startSimulation = () => {
     if (this.CY !== null) this.CY.destroy();
-    this.setState({ simulationRunning: true });
+    this.setState({
+      simulationRunning: true,
+      diagnosticData: {
+        atom: {
+          iteration: 0,
+          clusteringCoefficient: 0,
+          graphDensity: 0,
+          averageDegree: 0,
+          totalDegree: 0
+        },
+        ccPlotData: null,
+        densityPlotData: null
+      }
+    });
     this.CY = cytoscape({
       container: document.getElementById("cy"),
       layout: {
@@ -162,24 +176,32 @@ export default class GraphContainer extends React.Component {
       weaver: true
     }).run();
 
-    this.setState({
-      diagnosticData: {
-        atom: {
-          iteration: t,
-          clusteringCoefficient: CyUtil.calculateAverageClustering(
-            t,
-            this.nodesSleep
-          ),
-          graphDensity: this.CY.edges().length / this.CY.nodes().length,
-          averageDegree:
-            this.CY.nodes().totalDegree(true) / this.CY.nodes().length,
-          totalDegree: this.CY.nodes().totalDegree(true)
-        },
-        plotData: CyUtil.nodesEdgesNumberPlotData(this.nodesSleep)
-      }
+    this.setState((state) => {
+      const graphDensity = this.CY.edges().length / this.CY.nodes().length;
+      
+      return {
+        diagnosticData: {
+          atom: {
+            iteration: t,
+            clusteringCoefficient: CyUtil.calculateAverageClustering(
+              t,
+              this.nodesSleep
+            ),
+            graphDensity,
+            averageDegree:
+              this.CY.nodes().totalDegree(true) / this.CY.nodes().length,
+            totalDegree: this.CY.nodes().totalDegree(true)
+          },
+          ccPlotData: CyUtil.nodesEdgesNumberPlotData(this.nodesSleep),
+          densityPlotData: CyUtil.densityPlotData(state.diagnosticData.densityPlotData, graphDensity)
+        }
+      };
     });
 
-    Plotly.newPlot("plot", [this.state.diagnosticData.plotData], {width: 300, height: 350, margin: 10, paper: '#FFFFFF80'});
+    Plotly.newPlot('cc-plot', [this.state.diagnosticData.ccPlotData],
+      {width: 300, height: 350, margin: 10, paper: '#FFFFFF80'});
+    Plotly.newPlot('density-plot', [this.state.diagnosticData.densityPlotData],
+      {width: 300, height: 350, margin: 10, paper: '#FFFFFF80'});
   };
 
   render() {

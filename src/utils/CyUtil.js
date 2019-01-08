@@ -74,4 +74,21 @@ export class CyUtil {
       type: 'bar'
     };
   }
+
+  static densityPlotData(previousData, currentDensity) {
+    if(!previousData)
+      return {
+        x: [0],
+        y: [currentDensity],
+        type: 'scatter'
+      };
+
+    const currentIteration = previousData.x.slice(-1).pop() + 1;
+
+    return {
+      x: [...previousData.x, currentIteration],
+      y: [...previousData.y, currentDensity],
+      type: 'scatter'
+    };
+  }
 }

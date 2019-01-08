@@ -11,7 +11,8 @@ export default class LiveData extends React.Component {
                     ))}
                 </ul>
         
-                <div id='plot'></div>
+                <div id='cc-plot'></div>
+                <div id='density-plot'></div>
             </div>
         );
     }
