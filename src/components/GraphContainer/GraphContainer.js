@@ -16,6 +16,7 @@ export default class GraphContainer extends React.Component {
 
   state = {
     simulationRunning: false,
+    simulationPaused: false,
     diagnosticData: {
       atom: {
         iteration: {
@@ -39,6 +40,7 @@ export default class GraphContainer extends React.Component {
     if (this.CY !== null) this.CY.destroy();
     this.setState({
       simulationRunning: true,
+      simulationPaused: false,
       diagnosticData: {
         atom: {
           iteration: {
@@ -97,6 +99,38 @@ export default class GraphContainer extends React.Component {
       clearTimeout(el);
     }
   };
+
+  pauseSimulation = () => {
+    this.setState({
+      simulationRunning: false,
+      simulationPaused: true
+    });
+    for (const el of this.timeouts) {
+      clearTimeout(el);
+    }
+  }
+
+  resumeSimulation = () => {
+    const { simulationRunning } = this.state;
+    const iteration = this.state
+                          .diagnosticData
+                          .atom
+                          .iteration
+                          .value;
+
+    this.setState({
+      simulationRunning: true,
+      simulationPaused: false
+    });
+
+    for (let t = iteration; t < this.T; t++) {
+      this.timeouts.push(
+        setTimeout(() => {
+          if (this.state.simulationRunning) this.simulate(t);
+        }, (t - iteration) * 1000)
+      );
+    }
+  }
 
   simulate = t => {
     // Faza I
@@ -245,14 +279,12 @@ export default class GraphContainer extends React.Component {
   };
 
   render() {
-    const { simulationRunning } = this.state;
+    const { simulationRunning, simulationPaused } = this.state;
     return (
       <>
         <div className={"GraphContainer"} id="cy" />
-        {simulationRunning ? (
-          <LiveData diagnosticData={this.state.diagnosticData.atom} />
-        ) : null}
-        {simulationRunning ? null : (
+        <LiveData diagnosticData={this.state.diagnosticData.atom} />
+        {simulationRunning || simulationPaused ? null : (
           <Button
             top={"50%"}
             left={"50%"}
@@ -261,14 +293,32 @@ export default class GraphContainer extends React.Component {
             text={"START"}
           />
         )}
-        {simulationRunning ? (
+        {simulationPaused ? (
           <Button
-            top={108}
-            left={60}
-            backgroundColor={"#50bcac"}
-            onClick={this.stopSimulation}
-            text={"STOP"}
+            top={"50%"}
+            left={"50%"}
+            backgroundColor={"#f94b29"}
+            onClick={this.resumeSimulation}
+            text={"RESUME"}
           />
+        ) : null}
+        {simulationRunning ? (
+          <>
+            <Button
+              top={108}
+              left={60}
+              backgroundColor={"#50bcac"}
+              onClick={this.stopSimulation}
+              text={"STOP"}
+            />
+            <Button
+              top={188}
+              left={60}
+              backgroundColor={"#50bcac"}
+              onClick={this.pauseSimulation}
+              text={"PAUSE"}
+            />
+          </>
         ) : null}
       </>
     );
