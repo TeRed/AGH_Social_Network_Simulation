@@ -7,8 +7,8 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <GraphContainer />
         <NavBar />
+        <GraphContainer />
       </div>
     );
   }

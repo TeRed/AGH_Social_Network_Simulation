@@ -1,5 +1,4 @@
 export class CyUtil {
-  // N = (t) => Math.abs(Math.floor(3900*t*t + 76000*t - 130000));
   static N(t) {
     if(t > 15) {
       return Math.floor(Math.random() * (20 - 8) + 8);

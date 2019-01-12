@@ -1,8 +1,21 @@
 .LiveData {
+    width: 300px;
     position: absolute;
-    right: 5px;
-    bottom: 5px;
-    background-color: #00000050;
-    padding: 5px;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    overflow: auto;
+    background-color: #ffffff;
     font-size: 10pt;
+    text-align: center;
+}
+
+.atom-data-container {
+    list-style-type: none;
+    padding: 0;
+    margin: 5px 0;
+}
+
+.atom-data-container > li {
+    padding: 3px;
 }
