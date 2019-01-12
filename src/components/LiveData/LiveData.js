@@ -7,9 +7,21 @@ export default class LiveData extends React.Component {
             <div className={'LiveData'}>
                 <h1>Live Data</h1>
                 <ul className={'atom-data-container'} >
-                    {Object.keys(this.props.diagnosticData).map(key => (
-                        <li>{key} = {this.props.diagnosticData[key].toFixed(2)}</li>
-                    ))}
+                    {Object.keys(this.props.diagnosticData).map(key => {
+                            const atom = this.props.diagnosticData[key];
+                            let fixedLength = 2;
+                            let atomValue = atom;
+
+                            if(atom.constructor === Object) {
+                                fixedLength = atom.fixed;
+                                atomValue = atom.value;
+                            }
+                            
+                            return (
+                                <li>{key} = {atomValue.toFixed(fixedLength)}</li>
+                            );
+                        })
+                    }
                 </ul>
                 <div className={'graph-container'} id='cc-plot'></div>
                 <div className={'graph-container'} id='density-plot'></div>

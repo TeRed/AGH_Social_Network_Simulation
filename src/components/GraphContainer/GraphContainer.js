@@ -18,11 +18,17 @@ export default class GraphContainer extends React.Component {
     simulationRunning: false,
     diagnosticData: {
       atom: {
-        iteration: 0,
+        iteration: {
+          value: 0,
+          fixed: 0
+        },
         clusteringCoefficient: 0,
         graphDensity: 0,
         averageDegree: 0,
-        totalDegree: 0
+        totalDegree: {
+          value: 0,
+          fixed: 0
+        },
       },
       ccPlotData: null,
       densityPlotData: null
@@ -35,11 +41,17 @@ export default class GraphContainer extends React.Component {
       simulationRunning: true,
       diagnosticData: {
         atom: {
-          iteration: 0,
+          iteration: {
+            value: 0,
+            fixed: 0
+          },
           clusteringCoefficient: 0,
           graphDensity: 0,
           averageDegree: 0,
-          totalDegree: 0
+          totalDegree: {
+            value: 0,
+            fixed: 0
+          },
         },
         ccPlotData: null,
         densityPlotData: null
@@ -182,7 +194,9 @@ export default class GraphContainer extends React.Component {
       return {
         diagnosticData: {
           atom: {
-            iteration: t,
+            iteration: {
+              value: t
+            },
             clusteringCoefficient: CyUtil.calculateAverageClustering(
               t,
               this.nodesSleep
@@ -190,7 +204,9 @@ export default class GraphContainer extends React.Component {
             graphDensity,
             averageDegree:
               this.CY.nodes().totalDegree(true) / this.CY.nodes().length,
-            totalDegree: this.CY.nodes().totalDegree(true)
+            totalDegree: {
+              value: this.CY.nodes().totalDegree(true)
+            }
           },
           ccPlotData: CyUtil.nodesEdgesNumberPlotData(this.nodesSleep),
           densityPlotData: CyUtil.densityPlotData(state.diagnosticData.densityPlotData, graphDensity)

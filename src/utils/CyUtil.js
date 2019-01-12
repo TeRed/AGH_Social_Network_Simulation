@@ -48,7 +48,7 @@ export class CyUtil {
       }
     });
 
-    return triangles / trials;
+    return (triangles / trials) * 100;
   }
 
   static calclateAverageNodeDegree(nodes) {
