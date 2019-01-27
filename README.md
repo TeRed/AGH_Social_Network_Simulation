@@ -15,3 +15,8 @@ $ yarn start
 $ npm install
 $ npm start
 ```
+## Creators
+
+* [Albert Duź](https://github.com/TeRed)
+* [Przemek Filipek](https://github.com/przemek279)
+* [Jakub Adamczyk](https://github.com/adamczyk777)
